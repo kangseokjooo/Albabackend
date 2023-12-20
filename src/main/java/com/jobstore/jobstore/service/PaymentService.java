@@ -28,8 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class PaymentService {
-    @Autowired
-    private AttendanceService attendanceService;
+
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
@@ -37,7 +36,7 @@ public class PaymentService {
     @Autowired
     private PaymentAdminRepository paymentAdminRepository;
 
-    public Payment addPaymentForMember(String memberid, LocalDateTime register, long pay) {
+    public Payment addPaymentForMember(String memberid, LocalDateTime register, long pay,long worktime) {
         // Member member = memberRepository.findByMemberidAndStoreid(memberid, storeid);
         Member member = memberRepository.findByMemberid2(memberid);
         long storeid=memberRepository.findeByMemberidForStoreid(memberid);
@@ -47,6 +46,7 @@ public class PaymentService {
             newPayment.setMonth(localDateTimeToMonth(register));
             newPayment.setRegister(register);
             newPayment.setMember(member);
+            newPayment.setWorktime(worktime);
             return paymentRepository.save(newPayment);
         } else {
             return null;
@@ -184,7 +184,7 @@ public class PaymentService {
         LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(java.time.DayOfWeek.SUNDAY)).withHour(23).withMinute(59).withSecond(59); // 이번 주 마지막 일시
 
         long month = localDateTimeToMonth(time);
-
+        long weekTime =0;
         List<Payment> payments =  paymentRepository.findByRegister(memberid);
         long result =0;
         int chk=0;
@@ -192,25 +192,18 @@ public class PaymentService {
         for(Payment payment : payments){
             if(checkLocaltime(startOfWeek,payment.getRegister())){
                 if(checkLocaltime(payment.getRegister(),endOfWeek)){
-
                     System.out.println("endOfWeek : "+endOfWeek);
                     System.out.println("payment.getRegister(): "+payment.getRegister());
-             
-                    long weekTime = attendanceService.localDateTimeToWeek(memberid);
-                    if(weekTime>=900){
-                        if(attendanceService.confirmCheck(memberid)){
-                            chk=1;
-                        }
-                    }
-
+                    weekTime += payment.getWorktime();
+                    System.out.println();
                     result += payment.getPay();
                 }
             }
             //result += payment.getPay();
         }
-        if(chk==1){
-            result+=result*(1/5);
-
+        if(weekTime>=15){
+            result+=result*0.2;
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+weekTime);
         }
 
         return result;

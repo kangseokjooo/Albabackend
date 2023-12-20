@@ -27,10 +27,8 @@ public interface PaymentRepository extends JpaRepository<Payment,Long> {
     List<Long> findByStoreidAllmember(@Param("storeid") long storeid,@Param("month") long month);
     @Query("SELECT p FROM Payment p WHERE p.member.memberid = :memberid")
     List<Payment> findByRegister(@Param("memberid") String memberid);
-
     @Query("SELECT p FROM Payment p WHERE p.member.memberid=:memberid")
-    Page<Payment> findByMemberid(@Param("memberid")String memberid, Pageable pageable);
-
+    Page<Payment> findByMemberid(@Param("memberid") String memberid, Pageable pageable);
     @Query("SELECT p.pay from Payment p WHERE p.member.memberid=:memberid AND p.month=:month")
     List<Long> findeByMemberidAndMonth(@Param("memberid") String memberid, @Param("month") long month);
 

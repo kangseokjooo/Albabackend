@@ -42,7 +42,7 @@ public class PaymentController {
             content = @Content(schema=@Schema(implementation = PaymentinsertDto.class)))
                                                              @RequestBody PaymentinsertDto paymentinsertDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         if (memberService.findByMemberidToRole(paymentinsertDto.getMemberid()).equals("USER")) {
-            Payment paydata = paymentService.addPaymentForMember(paymentinsertDto.getMemberid(), paymentinsertDto.getRegister(), paymentinsertDto.getPay());
+            Payment paydata = paymentService.addPaymentForMember(paymentinsertDto.getMemberid(), paymentinsertDto.getRegister(), paymentinsertDto.getPay(),paymentinsertDto.getWorktime());
             if (paydata != null) {
                 return ResponseEntity.ok(ResultDto.of("200", "급여정보삽입완료", paydata));
             }
