@@ -245,7 +245,20 @@ public class AttendanceService {
         }
         return result;
     }
+    public boolean confirmCheck(String memberid){
+        List<Attendance> attendances =attendanceRepository.findByMemberMemberid(memberid);
+        for(Attendance list : attendances){
+            if(list.getConfirm()==0){
+                return false;
+            }
+//            if(list.getWorker() == memberid){
+//
+//            }
 
+
+        }
+        return true;
+    }
     //저번달과 이번달 비교 퍼센트
     public double workPercent(String memberid){
         LocalDateTime time = LocalDateTime.now();
