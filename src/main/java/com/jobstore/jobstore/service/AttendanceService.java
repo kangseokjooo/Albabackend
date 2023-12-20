@@ -45,6 +45,7 @@ public class AttendanceService {
             Attendance attendance = attendanceDto.toEntity();
             attendance.setMember(member);
             attendance.setStoreid(storeid);
+
             attendanceRepository.save(attendance);
             return true;
         }
@@ -114,9 +115,9 @@ public class AttendanceService {
         return false;
     }
     //어드민 승인
-    public AttendanceUpdateDto confirmAttendance(AttendanceUpdateDto attendanceUpdateDto) {
+    public AttendanceUpdateDto confirmAttendance(AttendanceUpdateDto attendanceUpdateDto,Member member) {
         Attendance attendance = attendanceRepository.findByWorkderAndAttendid(attendanceUpdateDto.getWorker(), attendanceUpdateDto.getAttendid());
-        Member member = memberRepository.findByMemberid2(attendanceUpdateDto.getMemberid());
+     //   Member member = memberRepository.findByMemberid2(attendanceUpdateDto.getMemberid());
         if (attendance != null) {
             if (member != null) {
                 if(attendanceUpdateDto.getConfirm() == 1){
@@ -150,16 +151,18 @@ public class AttendanceService {
             return workerList;
         }
         return null;
-
     }
     /**
      * Attendance 급여계산
      */
-    public long payCalculate(AttendanceUpdateDto attendanceUpdateDto){
-        Member member = memberRepository.findByMemberid2(attendanceUpdateDto.getMemberid());
+    public Attendance findByWorkderAndAttendid(String worker,long attendid){
+        return attendanceRepository.findByWorkderAndAttendid(worker,attendid);
+    }
+    public long payCalculate(AttendanceUpdateDto attendanceUpdateDto,Member member,Attendance attendance){
+       //Member member = memberRepository.findByMemberid2(attendanceUpdateDto.getMemberid());
         long result;
         if(member != null){
-            Attendance attendance = attendanceRepository.findByWorkderAndAttendid(attendanceUpdateDto.getWorker(),attendanceUpdateDto.getAttendid());
+            //Attendance attendance = attendanceRepository.findByWorkderAndAttendid(attendanceUpdateDto.getWorker(),attendanceUpdateDto.getAttendid());
             if(attendance != null){
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -173,7 +176,7 @@ public class AttendanceService {
                 long hours = duration2.toHours(); // 시간 단위로 시간 차이 구하기
                 long minutes = duration2.toMinutes(); // 분 단위로 시간 차이 구하기
                 System.out.println("--------attendanceUpdateDto 급여------- "+attendanceUpdateDto.getWage());
-                result = hours*attendanceUpdateDto.getWage();
+                result = hours*attendance.getWage();
                 System.out.println("result : "+result);
                 return result;
             }
@@ -202,20 +205,23 @@ public class AttendanceService {
         List<Attendance> attendance= attendanceRepository.findByWorker(memberid);
         if(attendance != null){
             for(Attendance attendlist : attendance){
-                long time = attendlist.getLeavework().getMonthValue();
+                if(attendlist.getConfirm()==1){
+                    long time = attendlist.getLeavework().getMonthValue();
 
-                if(time == month){
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    if(time == month){
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-                    LocalDateTime leave = attendlist.getLeavework();
-                    String formatLeave = leave.format(formatter);
-                    LocalDateTime go = attendlist.getGowork();
-                    String formatGo = go.format(formatter);
+                        LocalDateTime leave = attendlist.getLeavework();
+                        String formatLeave = leave.format(formatter);
+                        LocalDateTime go = attendlist.getGowork();
+                        String formatGo = go.format(formatter);
 
-                    Duration duration = Duration.between(go, leave); // 두 시간의 차이 계산
-                    long minutes = duration.toMinutes(); // 분 단위로 시간 차이 구하기
-                    result += minutes;
+                        Duration duration = Duration.between(go, leave); // 두 시간의 차이 계산
+                        long minutes = duration.toMinutes(); // 분 단위로 시간 차이 구하기
+                        result += minutes;
+                    }
                 }
+
             }
         }
         return result;
@@ -224,24 +230,27 @@ public class AttendanceService {
     //이번주 일한 시간
     public long localDateTimeToWeek(String memberid){
         LocalDateTime now = LocalDateTime.now(); // 현재 날짜와 시간
-        LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)); // 이번 주 시작일
+        LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)).withHour(0).withMinute(0).withSecond(0); // 이번 주 시작일
         LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(java.time.DayOfWeek.SUNDAY)).withHour(23).withMinute(59).withSecond(59); // 이번 주 마지막 일시
         List<Attendance> attendances= attendanceRepository.findByWorker(memberid);
         long result =0;
         for(Attendance attendance : attendances){
-            if(paymentService.checkLocaltime(startOfWeek,attendance.getLeavework())){
-                if(paymentService.checkLocaltime(attendance.getLeavework(),endOfWeek)){
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            if(attendance.getConfirm()==1){
+                if(paymentService.checkLocaltime(startOfWeek,attendance.getLeavework())){
+                    if(paymentService.checkLocaltime(attendance.getLeavework(),endOfWeek)){
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-                    LocalDateTime leave = attendance.getLeavework();
-                    String formatLeave = leave.format(formatter);
-                    LocalDateTime go = attendance.getGowork();
-                    String formatGo = go.format(formatter);
+                        LocalDateTime leave = attendance.getLeavework();
+                        String formatLeave = leave.format(formatter);
+                        LocalDateTime go = attendance.getGowork();
+                        String formatGo = go.format(formatter);
 
-                    Duration duration = Duration.between(go, leave); // 두 시간의 차이 계산
-                    result += duration.toMinutes(); // 분 단위로 시간 차이 구하기
+                        Duration duration = Duration.between(go, leave); // 두 시간의 차이 계산
+                        result += duration.toMinutes(); // 분 단위로 시간 차이 구하기
+                    }
                 }
             }
+
         }
         return result;
     }
@@ -377,7 +386,7 @@ public class AttendanceService {
         //한페이지당 사이즈
         Integer size = 5;
         System.out.println("getAttendancesByMemberId333333");
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "attendid");
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "start");
         Page<Attendance> attendances;
         if(role.equals("USER")){
             System.out.println("getAttendancesByMemberId1");

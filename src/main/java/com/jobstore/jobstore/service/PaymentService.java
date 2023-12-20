@@ -41,45 +41,83 @@ public class PaymentService {
         // Member member = memberRepository.findByMemberidAndStoreid(memberid, storeid);
         Member member = memberRepository.findByMemberid2(memberid);
         long storeid=memberRepository.findeByMemberidForStoreid(memberid);
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@"+storeid);
         if (member != null) {
             Payment newPayment = new Payment();
             newPayment.setPay(pay);
             newPayment.setMonth(localDateTimeToMonth(register));
             newPayment.setRegister(register);
             newPayment.setMember(member);
-            System.out.println("newPayment : "+newPayment);
             return paymentRepository.save(newPayment);
         } else {
             return null;
         }
     }
     //어드민 이번달 총 지출액
-    public Long addPaymentForAdmin(String memberid,long month){
-        PaymentAdmin paymentAdmin=new PaymentAdmin();
-        String Role=memberRepository.findByMemberidToRole(memberid);
-        boolean existAdmin= paymentAdminRepository.existsByMemberidAndMonth(memberid,month);
-        long sum = 0;
-        if(Role.equals("ADMIN")){
-            //        System.out.println("페이먼츠 서비스 입니다");
-            long storeid=memberRepository.findeByMemberidForStoreid(memberid);
-//        System.out.println("Stordossdjsj:"+storeid);
-            List<Long> lists=paymentRepository.findByStoreidAllmember(storeid,month);
-
-            for (Long payment : lists) { // 리스트 안의 각 Long 값을 가져와 더합니다.
-                sum += payment;
-            }
-            if(!existAdmin) {
-                paymentAdmin.setMemberid(memberid);
-                paymentAdmin.setStoreid(storeid);
-                paymentAdmin.setMonth(month);
-                paymentAdmin.setSum(sum);
-                paymentAdminRepository.save(paymentAdmin);
-            }
-//        System.out.println("123123123123123123123123123123"+sum);
-            return sum;
+//    public Long addPaymentForAdmin(String memberid,long month){
+//        PaymentAdmin paymentAdmin=new PaymentAdmin();
+//        String Role=memberRepository.findByMemberidToRole(memberid);
+//        boolean existAdmin= paymentAdminRepository.existsByMemberidAndMonth(memberid,month);
+//        long sum = 0;
+//        if(Role.equals("ADMIN")){
+//            //        System.out.println("페이먼츠 서비스 입니다");
+//            long storeid=memberRepository.findeByMemberidForStoreid(memberid);
+////        System.out.println("Stordossdjsj:"+storeid);
+//            List<Long> lists=paymentRepository.findByStoreidAllmember(storeid,month);
+//
+//            for (Long payment : lists) { // 리스트 안의 각 Long 값을 가져와 더합니다.
+//                sum += payment;
+//            }
+//            if(!existAdmin) {
+//                paymentAdmin.setMemberid(memberid);
+//                paymentAdmin.setStoreid(storeid);
+//                paymentAdmin.setMonth(month);
+//                paymentAdmin.setSum(sum);
+//                paymentAdminRepository.save(paymentAdmin);
+//            }
+////        System.out.println("123123123123123123123123123123"+sum);
+//            return sum;
+//        }
+//            return sum;
+//    }
+    public Long getPaymentForAdmin(String memberid, long month) {
+        String role = memberRepository.findByMemberidToRole(memberid);
+        if (role.equals("ADMIN")) {
+            PaymentAdmin paymentAdmin = paymentAdminRepository.findBymemberidAndMonth(memberid,month);
+            long result = calculatePayment(memberid, month);
+            paymentAdmin.setSum(result);
+            paymentAdminRepository.save(paymentAdmin);
+            return result;
         }
-            return sum;
+        return 0L;
+    }
+
+    private Long calculatePayment(String memberid, long month) {
+        long storeid = memberRepository.findeByMemberidForStoreid(memberid);
+        List<Long> lists = paymentRepository.findByStoreidAllmember(storeid, month);
+        return lists.stream().mapToLong(Long::longValue).sum();
+    }
+    public Long insertPaymentForAdmin(String memberid, long month) {
+        String role = memberRepository.findByMemberidToRole(memberid);
+        if (role.equals("ADMIN")) {
+            boolean existAdmin = paymentAdminRepository.existsByMemberidAndMonth(memberid, month);
+            if (!existAdmin) {
+                long storeid = memberRepository.findeByMemberidForStoreid(memberid);
+                boolean existmember=paymentRepository.existsByMemberStoreStoreidAndMonth(storeid,month);
+               if(existmember) {
+                    long sum = calculatePayment(memberid, month);
+                    PaymentAdmin paymentAdmin = new PaymentAdmin();
+                    paymentAdmin.setMemberid(memberid);
+                    paymentAdmin.setStoreid(storeid);
+                    paymentAdmin.setMonth(month);
+                    paymentAdmin.setSum(sum);
+                    paymentAdminRepository.save(paymentAdmin);
+                    return sum;
+                }else{
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 //    public List<PaymentDto> findMemberid_ForAllPayment(String memberid){
 //        List<Payment> memberPaymentData=paymentRepository.findByMemberId(memberid);
@@ -150,22 +188,21 @@ public class PaymentService {
         List<Payment> payments =  paymentRepository.findByRegister(memberid);
         long result =0;
         int chk=0;
-        //List<Long> payList = new ArrayList<>();
+        List<Long> payList = new ArrayList<>();
         for(Payment payment : payments){
             if(checkLocaltime(startOfWeek,payment.getRegister())){
-                System.out.println("startOfWeek : "+startOfWeek);
-                System.out.println("payment.getRegister(): "+payment.getRegister());
-
                 if(checkLocaltime(payment.getRegister(),endOfWeek)){
+
                     System.out.println("endOfWeek : "+endOfWeek);
                     System.out.println("payment.getRegister(): "+payment.getRegister());
-                    //
+             
                     long weekTime = attendanceService.localDateTimeToWeek(memberid);
                     if(weekTime>=900){
                         if(attendanceService.confirmCheck(memberid)){
                             chk=1;
                         }
                     }
+
                     result += payment.getPay();
                 }
             }
@@ -244,7 +281,7 @@ public class PaymentService {
     }
     public PaymentPagenationDto findByMemberidUser(String memberid ,Integer page){
         Integer size=5;
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "month");
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "register");
         Page<Payment> paymentPage = paymentRepository.findByMemberid(memberid, pageRequest);
 
         List<PaymentDto> paymentDtoList = new ArrayList<>();
