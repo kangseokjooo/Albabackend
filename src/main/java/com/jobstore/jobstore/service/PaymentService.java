@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 @Service
 public class PaymentService {
     @Autowired
+    private AttendanceService attendanceService;
+    @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
     private MemberRepository memberRepository;
@@ -185,16 +187,32 @@ public class PaymentService {
 
         List<Payment> payments =  paymentRepository.findByRegister(memberid);
         long result =0;
-        //List<Long> payList = new ArrayList<>();
+        int chk=0;
+        List<Long> payList = new ArrayList<>();
         for(Payment payment : payments){
             if(checkLocaltime(startOfWeek,payment.getRegister())){
                 if(checkLocaltime(payment.getRegister(),endOfWeek)){
-                    result += payment.getPay();
 
+                    System.out.println("endOfWeek : "+endOfWeek);
+                    System.out.println("payment.getRegister(): "+payment.getRegister());
+             
+                    long weekTime = attendanceService.localDateTimeToWeek(memberid);
+                    if(weekTime>=900){
+                        if(attendanceService.confirmCheck(memberid)){
+                            chk=1;
+                        }
+                    }
+
+                    result += payment.getPay();
                 }
             }
             //result += payment.getPay();
         }
+        if(chk==1){
+            result+=result*(1/5);
+
+        }
+
         return result;
         //System.out.println("result : "+result);
         //return result;
