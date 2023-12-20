@@ -21,6 +21,8 @@ public class Payment {
     private long month;
     @Column(length = 255,nullable = true)
     private LocalDateTime register;
+    @Column(length = 255,nullable = true)
+    private Long worktime;
 
     @JsonIgnore
     @ManyToOne

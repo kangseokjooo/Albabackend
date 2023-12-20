@@ -15,4 +15,5 @@ public class PaymentinsertDto {
     String memberid;
     long pay;
     LocalDateTime register;
+    long worktime;
 }

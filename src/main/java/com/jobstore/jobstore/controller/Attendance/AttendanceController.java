@@ -637,7 +637,7 @@ public class AttendanceController {
                 return ResponseEntity.ok(ResultDto.of("실패", "급여 계산에 실패했습니다.", null));
             }
             System.out.println(" attendanceUpdateDto.getLeavework():"+ result.getLeavework());
-            Payment payment = paymentService.addPaymentForMember(result.getWorker(), result.getLeavework(), payCalculate);
+            Payment payment = paymentService.addPaymentForMember(result.getWorker(), result.getLeavework(), payCalculate,payCalculate/result.getWage());
             if(payment == null){
                 return ResponseEntity.ok(ResultDto.of("실패", "급여 추가에 실패했습니다.", null));
             }
