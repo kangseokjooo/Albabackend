@@ -203,7 +203,6 @@ public class PaymentService {
         }
         if(weekTime>=15){
             result+=result*0.2;
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+weekTime);
         }
 
         return result;
