@@ -192,10 +192,7 @@ public class PaymentService {
         for(Payment payment : payments){
             if(checkLocaltime(startOfWeek,payment.getRegister())){
                 if(checkLocaltime(payment.getRegister(),endOfWeek)){
-                    System.out.println("endOfWeek : "+endOfWeek);
-                    System.out.println("payment.getRegister(): "+payment.getRegister());
                     weekTime += payment.getWorktime();
-                    System.out.println();
                     result += payment.getPay();
                 }
             }
