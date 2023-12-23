@@ -624,7 +624,6 @@ public class AttendanceController {
 //            String role = memberService.findByMemberidToRole(attendanceUpdateDto.getMemberid());
 //            System.out.println("0");
 //            if (role.equals("ADMIN")) {
-            System.out.println("1");
             AttendanceUpdateDto result = attendanceService.confirmAttendance(attendanceUpdateDto,member);
             if (result ==null) {
                 return ResponseEntity.ok(ResultDto.of("실패", "result를 받아오는데 실패했습니다.", null));
