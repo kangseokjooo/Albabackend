@@ -310,13 +310,10 @@ public class PaymentService {
     public Map<String,Long> AdminfindEachMemberPay(String memberid,long month){
         long storeid = memberRepository.findeByMemberidForStoreid(memberid);
 
-        // 해당 가게 내의 멤버들의 memberid 목록을 가져옵니다.
         List<Object[]> memberList = paymentRepository.findMonthlyPayByStoreAndMonth(storeid, month);
 
-        // 각 멤버의 월급을 저장할 맵 생성
         Map<String, Long> monthlyPayMap = new HashMap<>();
 
-        // 각 멤버별로 월급을 계산하여 맵에 추가
         for (Object[] memberPay : memberList) {
             String memberId = (String) memberPay[0];
             Long monthlyPay = (Long) memberPay[1];
