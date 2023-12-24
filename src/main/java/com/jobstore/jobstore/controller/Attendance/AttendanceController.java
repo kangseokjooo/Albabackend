@@ -631,7 +631,6 @@ public class AttendanceController {
             System.out.println("2"+result.getWage());
             Attendance attendance = attendanceService.findByWorkderAndAttendid(attendanceUpdateDto.getWorker(),attendanceUpdateDto.getAttendid());
             long payCalculate = attendanceService.payCalculate(result,member,attendance);
-            System.out.println("payCalculate"+payCalculate);
             if (payCalculate == -1) {
                 return ResponseEntity.ok(ResultDto.of("실패", "급여 계산에 실패했습니다.", null));
             }
