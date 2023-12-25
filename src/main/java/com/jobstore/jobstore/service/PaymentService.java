@@ -64,7 +64,7 @@ public class PaymentService {
 ////        System.out.println("Stordossdjsj:"+storeid);
 //            List<Long> lists=paymentRepository.findByStoreidAllmember(storeid,month);
 //
-//            for (Long payment : lists) { // 리스트 안의 각 Long 값을 가져와 더합니다.
+//            for (Long payment : lists) {
 //                sum += payment;
 //            }
 //            if(!existAdmin) {
@@ -141,9 +141,7 @@ public class PaymentService {
      */
     public Long paymentMain(long month){
         List<Payment> payments =  paymentRepository.findByMonth(month);
-       // Payment payment =  paymentRepository.findByMonth(month);
         long result =0;
-        //List<Long> payList = new ArrayList<>();
         for(Payment payment : payments){
             result += payment.getPay();
         }
@@ -154,9 +152,7 @@ public class PaymentService {
      */
     public Long wageWeek(long month){
         List<Payment> payments =  paymentRepository.findByMonth(month);
-        // Payment payment =  paymentRepository.findByMonth(month);
         long result =0;
-        //List<Long> payList = new ArrayList<>();
         for(Payment payment : payments){
             result += payment.getPay();
         }
