@@ -622,7 +622,6 @@ public class AttendanceController {
             }
 
 //            String role = memberService.findByMemberidToRole(attendanceUpdateDto.getMemberid());
-//            System.out.println("0");
 //            if (role.equals("ADMIN")) {
             AttendanceUpdateDto result = attendanceService.confirmAttendance(attendanceUpdateDto,member);
             if (result ==null) {
