@@ -105,22 +105,7 @@ public ResponseEntity<ResultDto<Map<Long,Long>>> findAllmember(@PathVariable Str
         }
     }
 
-//    @PostMapping("/payment")
-//    @Operation(summary = "Payment api", description = "payment api입니다.")
-//    @ResponseBody
-//    public ResponseEntity<ResultDto<Long>> paymentMain(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "요청파라미터", required = true,
-//            content = @Content(schema=@Schema(implementation = PaymentinsertDto.class)))
-//                                                       @RequestBody PaymentAllPaymentDto paymentAllPaymentDto){
-//        //   2023-11-20T12:00:00
-//        long month= paymentService.localDateTimeToMonth(paymentAllPaymentDto.getTime());
-//
-//        long week = paymentService.localDateTimeToWeek(paymentAllPaymentDto.getTime(),paymentAllPaymentDto.getMemberid());
-//
-//        //System.out.println("month:"+month);
-//        Long payment = paymentService.paymentMain(month);
-//        //System.out.println("payment:"+payment);
-//        return ResponseEntity.ok(ResultDto.of("resultcode","조회성공",payment));
-//    }
+
     @PostMapping("/percent")
     @Operation(summary = "Payment api", description = "저번달 대비 퍼센트 증감률(User)")
     @ResponseBody
