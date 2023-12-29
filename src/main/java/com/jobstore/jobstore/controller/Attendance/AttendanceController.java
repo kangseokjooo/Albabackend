@@ -383,7 +383,6 @@ public class AttendanceController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "요청파라미터", required = true,
                     content = @Content(schema = @Schema(implementation = AttendanceDto.class)))
             @RequestBody AttendanceDto attendanceDto
-            //, @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         try {
             System.out.println("-----------------createAttendance-----------------");
