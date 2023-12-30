@@ -37,7 +37,6 @@ public class PaymentService {
     private PaymentAdminRepository paymentAdminRepository;
 
     public Payment addPaymentForMember(String memberid, LocalDateTime register, long pay,long worktime) {
-        // Member member = memberRepository.findByMemberidAndStoreid(memberid, storeid);
         Member member = memberRepository.findByMemberid2(memberid);
         long storeid=memberRepository.findeByMemberidForStoreid(memberid);
         if (member != null) {
