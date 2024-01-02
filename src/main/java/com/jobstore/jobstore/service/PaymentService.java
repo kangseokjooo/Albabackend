@@ -51,7 +51,7 @@ public class PaymentService {
             return null;
         }
     }
-    //어드민 이번달 총 지출액
+
 //    public Long addPaymentForAdmin(String memberid,long month){
 //        PaymentAdmin paymentAdmin=new PaymentAdmin();
 //        String Role=memberRepository.findByMemberidToRole(memberid);
