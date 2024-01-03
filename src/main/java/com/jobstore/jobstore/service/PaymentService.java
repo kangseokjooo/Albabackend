@@ -130,9 +130,7 @@ public class PaymentService {
 //        }
 //        return result;
 //    }
-    //어드민 전체 조회
 
-    //전체 유저 조회 및 페이지네이션
 
 
     /**
