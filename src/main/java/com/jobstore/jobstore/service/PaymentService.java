@@ -52,32 +52,6 @@ public class PaymentService {
         }
     }
 
-//    public Long addPaymentForAdmin(String memberid,long month){
-//        PaymentAdmin paymentAdmin=new PaymentAdmin();
-//        String Role=memberRepository.findByMemberidToRole(memberid);
-//        boolean existAdmin= paymentAdminRepository.existsByMemberidAndMonth(memberid,month);
-//        long sum = 0;
-//        if(Role.equals("ADMIN")){
-//            //        System.out.println("페이먼츠 서비스 입니다");
-//            long storeid=memberRepository.findeByMemberidForStoreid(memberid);
-////        System.out.println("Stordossdjsj:"+storeid);
-//            List<Long> lists=paymentRepository.findByStoreidAllmember(storeid,month);
-//
-//            for (Long payment : lists) {
-//                sum += payment;
-//            }
-//            if(!existAdmin) {
-//                paymentAdmin.setMemberid(memberid);
-//                paymentAdmin.setStoreid(storeid);
-//                paymentAdmin.setMonth(month);
-//                paymentAdmin.setSum(sum);
-//                paymentAdminRepository.save(paymentAdmin);
-//            }
-////        System.out.println("123123123123123123123123123123"+sum);
-//            return sum;
-//        }
-//            return sum;
-//    }
     public Long getPaymentForAdmin(String memberid, long month) {
         String role = memberRepository.findByMemberidToRole(memberid);
         if (role.equals("ADMIN")) {
